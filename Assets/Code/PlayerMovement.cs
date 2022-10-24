@@ -6,6 +6,8 @@ public class PlayerMovement : MonoBehaviour
 {
     public Vector2 JumpForce = new Vector2(0, 300);
 
+    public Vector2 groundPound = new Vector2(0, -300);
+
     public Rigidbody2D Rb2d;
 
     private bool beenHit = false;
@@ -13,9 +15,11 @@ public class PlayerMovement : MonoBehaviour
     public float Speed;
 
     public bool OnGround;
+
+    public static bool InGroundPound;
     void Start()
     {
-        
+        Rb2d = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
@@ -35,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
         // Moves player left and right
         float xMove = Input.GetAxis("Horizontal");
 
-        
+
 
         // How we get there
         Vector3 newPos = transform.position;
@@ -47,6 +51,11 @@ public class PlayerMovement : MonoBehaviour
 
         //Set up object's posititon to our new one
         transform.position = newPos;
+
+        if (OnGround == false && Input.GetKeyDown(KeyCode.Space) && InGroundPound == false)
+        {
+            GroundPound();
+        }
     }
 
     public void OnCollisionEnter2D(Collision2D collision)
@@ -54,7 +63,14 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.transform.tag == "Ground")
         {
             OnGround = true;
+            InGroundPound = false;
         }
+
+        if(collision.gameObject.transform.tag == "Enemy")
+        {
+            Destroy(collision.gameObject);
+        }
+
     }
     public void OnCollisionExit2D(Collision2D collision)
     {
@@ -64,5 +80,11 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log(true);
         }
     }
-   
+   public void GroundPound()
+    {
+        InGroundPound = true;
+        Rb2d.velocity = Vector2.zero;
+        Rb2d.AddForce(groundPound);
+
+    }
 }
