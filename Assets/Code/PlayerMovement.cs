@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,6 +19,11 @@ public class PlayerMovement : MonoBehaviour
     public bool OnGround;
 
     public static bool InGroundPound;
+
+    public int CurrentLevel;
+
+    public bool facingRight = true;
+
     void Start()
     {
         Rb2d = GetComponent<Rigidbody2D>();
@@ -45,9 +52,17 @@ public class PlayerMovement : MonoBehaviour
         Vector3 newPos = transform.position;
 
         // Change the posistion on the Y Axis
-        newPos += new Vector3(xMove * Speed * Time.deltaTime, 0);
+        newPos += new Vector3(xMove * Speed * Time.deltaTime, 0, 0);
 
+        if (xMove<0 && facingRight) // if press left you are facing right, left means facing left
+        {
+            flip(); 
+        }
 
+        else if(xMove>0 && !facingRight)
+        {
+            flip();
+        }
 
         //Set up object's posititon to our new one
         transform.position = newPos;
@@ -85,6 +100,28 @@ public class PlayerMovement : MonoBehaviour
         InGroundPound = true;
         Rb2d.velocity = Vector2.zero;
         Rb2d.AddForce(groundPound);
-
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.tag == "Finish")
+        {
+            SceneManager.LoadScene(CurrentLevel);
+        }
+    }
+
+    void flip()
+    {
+        facingRight = !facingRight;
+        transform.Rotate(0f, 180f, 0f);
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "KillBox")
+        {
+           
+        }
+    }
+
 }
